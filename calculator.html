@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tango Teacher Revenue Calculator</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0d0d0d;--card:#161616;--border:#2a2a2a;--accent:#c9a84c;--accent2:#e8c97a;--text:#f0ede8;--muted:#888;--green:#4caf82;--red:#e05c5c}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:1.5rem 1rem 3rem}
+  h1{text-align:center;font-size:1.5rem;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:.25rem}
+  .subtitle{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:1.75rem}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+  .card h2{font-size:.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:1rem}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+  @media(max-width:420px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.3rem}
+  input{width:100%;background:#1e1e1e;border:1px solid var(--border);border-radius:8px;padding:.65rem .8rem;color:var(--text);font-size:1rem;transition:border-color .2s}
+  input:focus{outline:none;border-color:var(--accent)}
+  input[type=number]{-moz-appearance:textfield}
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+  .prefix{position:relative}
+  .prefix span{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;pointer-events:none}
+  .prefix input{padding-left:1.5rem}
+  .results-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+  @media(max-width:420px){.results-grid{grid-template-columns:1fr}}
+  .result-box{background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}
+  .result-box .val{font-size:1.5rem;font-weight:700;color:var(--green)}
+  .result-box .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:.25rem}
+  .result-box.big{grid-column:span 2}
+  @media(max-width:420px){.result-box.big{grid-column:span 1}}
+  .result-box.big .val{font-size:2rem;color:var(--accent2)}
+  .suggestions{margin-top:.75rem}
+  .suggestions h3{font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:.6rem}
+  .tip{background:#1a1a1a;border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem .9rem;margin-bottom:.5rem;font-size:.82rem;line-height:1.4}
+  .tip strong{color:var(--accent2)}
+  .actions{display:flex;gap:.75rem;margin-top:1rem}
+  .btn{flex:1;padding:.8rem;border:none;border-radius:10px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn-share{background:var(--accent);color:#0d0d0d}
+  .btn-share:hover{background:var(--accent2)}
+  .btn-share:active{transform:scale(.97)}
+  .copied{background:var(--green)!important;color:#fff!important}
+  .cta{background:linear-gradient(135deg,#1a1508,#1e1a0a);border:1px solid #3a3010;border-radius:14px;padding:1.25rem;text-align:center;margin-top:.5rem}
+  .cta p{font-size:.85rem;color:#c8b87a;margin-bottom:.6rem;line-height:1.5}
+  .cta a{color:var(--accent2);text-decoration:none;font-weight:600;font-size:.9rem;border-bottom:1px solid rgba(200,185,122,.35);padding-bottom:1px;transition:color .2s}
+  .cta a:hover{color:#fff}
+  .powered{text-align:center;color:#444;font-size:.7rem;margin-top:1.5rem}
+</style>
+</head>
+<body>
+
+<h1>💃 Tango Teacher Revenue Calculator</h1>
+<p class="subtitle">Know your numbers. Grow your studio.</p>
+
+<div class="card">
+  <h2>📚 Group Classes</h2>
+  <div class="grid">
+    <div>
+      <label>Classes per week</label>
+      <input type="number" id="classesWeek" value="5" min="0" max="50">
+    </div>
+    <div>
+      <label>Students per class</label>
+      <input type="number" id="studentsClass" value="8" min="0" max="100">
+    </div>
+    <div class="prefix">
+      <label>Price per class ($)</label>
+      <span>$</span>
+      <input type="number" id="priceClass" value="20" min="0">
+    </div>
+    <div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🥂 Private Lessons</h2>
+  <div class="grid">
+    <div>
+      <label>Privates per week</label>
+      <input type="number" id="privatesWeek" value="3" min="0" max="50">
+    </div>
+    <div class="prefix">
+      <label>Price per private ($)</label>
+      <span>$</span>
+      <input type="number" id="privatePrice" value="80" min="0">
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📊 Your Revenue</h2>
+  <div class="results-grid">
+    <div class="result-box">
+      <div class="val" id="weeklyRev">$0</div>
+      <div class="lbl">Weekly</div>
+    </div>
+    <div class="result-box">
+      <div class="val" id="monthlyRev">$0</div>
+      <div class="lbl">Monthly</div>
+    </div>
+    <div class="result-box big">
+      <div class="val" id="yearlyRev">$0</div>
+      <div class="lbl">🎯 Yearly Revenue</div>
+    </div>
+    <div class="result-box">
+      <div class="val" id="revPerStudent">$0</div>
+      <div class="lbl">Per Student / Mo</div>
+    </div>
+    <div class="result-box">
+      <div class="val" id="hourlyRate">$0</div>
+      <div class="lbl">Effective Hourly</div>
+    </div>
+  </div>
+
+  <div class="suggestions">
+    <h3>💡 Pricing Suggestions</h3>
+    <div id="tips"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-share" id="shareBtn" onclick="share()">🔗 Share My Results</button>
+  </div>
+</div>
+
+<div class="cta">
+  <p>Want AI to manage your tango studio — bookings, follow-ups, revenue tracking, and more?</p>
+  <a href="mailto:fedecachero@gmail.com?subject=AI Studio Manager - Interest&body=Hi! I used the Tango Revenue Calculator and I'm interested in AI studio management.">✉️ Contact us → fedecachero@gmail.com</a>
+</div>
+
+<p class="powered">Built for tango teachers who mean business 🇦🇷</p>
+
+<script>
+const ids=['classesWeek','studentsClass','priceClass','privatesWeek','privatePrice'];
+ids.forEach(id=>document.getElementById(id).addEventListener('input',calc));
+
+function v(id){return parseFloat(document.getElementById(id).value)||0}
+function fmt(n){return '$'+Math.round(n).toLocaleString()}
+
+function calc(){
+  const cw=v('classesWeek'),sc=v('studentsClass'),pc=v('priceClass'),pw=v('privatesWeek'),pp=v('privatePrice');
+  const weekGroup=cw*sc*pc, weekPriv=pw*pp;
+  const weekly=weekGroup+weekPriv;
+  const monthly=weekly*4.33;
+  const yearly=weekly*52;
+  const totalStudentsMo=cw*sc*4.33;
+  const revPerStudent=totalStudentsMo>0?monthly/totalStudentsMo:0;
+  const hoursWeek=cw*1.5+pw*1;
+  const hourly=hoursWeek>0?weekly/hoursWeek:0;
+
+  document.getElementById('weeklyRev').textContent=fmt(weekly);
+  document.getElementById('monthlyRev').textContent=fmt(monthly);
+  document.getElementById('yearlyRev').textContent=fmt(yearly);
+  document.getElementById('revPerStudent').textContent=fmt(revPerStudent);
+  document.getElementById('hourlyRate').textContent=fmt(hourly);
+
+  tips(pc,pp,monthly,sc,cw,pw);
+}
+
+function tips(pc,pp,monthly,sc,cw,pw){
+  const t=[];
+  const optGroup=Math.ceil(pc*1.20/5)*5;
+  const optPriv=Math.ceil(pp*1.20/5)*5;
+  const lift20g=(cw*sc*optGroup-cw*sc*pc)*4.33;
+  const lift20p=(pw*optPriv-pw*pp)*4.33;
+
+  if(pc>0&&pc<30) t.push(`<strong>Raise group price 20%</strong> → $${optGroup}/class adds <strong>+${fmt(lift20g)}/mo</strong>`);
+  if(pp>0&&pp<120) t.push(`<strong>Raise privates 20%</strong> → $${optPriv}/lesson adds <strong>+${fmt(lift20p)}/mo</strong>`);
+  if(sc<10&&cw>0) t.push(`<strong>Add ${10-sc} more students/class</strong> → extra <strong>+${fmt((10-sc)*pc*cw*4.33)}/mo</strong> at same effort`);
+  if(pw<5) t.push(`<strong>Book ${5-pw} more privates/week</strong> → adds <strong>+${fmt((5-pw)*pp*4.33)}/mo</strong> — highest ROI`);
+  if(monthly>3000) t.push(`🔥 <strong>You're doing great!</strong> Consider packages & monthly memberships to smooth cash flow`);
+  if(t.length===0) t.push(`Fill in your numbers above to get personalized suggestions`);
+
+  document.getElementById('tips').innerHTML=t.map(x=>`<div class="tip">${x}</div>`).join('');
+}
+
+function share(){
+  const params=new URLSearchParams();
+  ids.forEach(id=>params.set(id,document.getElementById(id).value));
+  const url=window.location.href.split('?')[0]+'?'+params.toString();
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=document.getElementById('shareBtn');
+    btn.textContent='✅ Link Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Share My Results';btn.classList.remove('copied')},2000);
+  }).catch(()=>{prompt('Copy this link:',url)});
+}
+
+function loadFromParams(){
+  const p=new URLSearchParams(window.location.search);
+  ids.forEach(id=>{if(p.has(id))document.getElementById(id).value=p.get(id)});
+}
+
+loadFromParams();
+calc();
+</script>
+</body>
+</html>
