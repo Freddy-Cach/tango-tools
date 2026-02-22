@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assistant Demo — Live Preview</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f23;color:#fff;min-height:100vh}
+.header{padding:20px;text-align:center;background:linear-gradient(135deg,#1a1a2e,#16213e)}
+.header h1{font-size:1.5em;margin-bottom:4px}
+.header p{opacity:0.7;font-size:0.9em}
+.chat-container{max-width:500px;margin:20px auto;background:#1a1a2e;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.chat-header{background:#16213e;padding:16px;display:flex;align-items:center;gap:12px}
+.avatar{width:40px;height:40px;background:#e94560;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2em}
+.chat-header .name{font-weight:700;font-size:1.1em}
+.chat-header .status{font-size:0.8em;color:#4ade80}
+.messages{padding:16px;min-height:400px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:80%;padding:12px 16px;border-radius:16px;font-size:0.95em;line-height:1.5;animation:fadeIn 0.5s ease}
+.msg.user{background:#e94560;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.bot{background:#2d2d5e;align-self:flex-start;border-bottom-left-radius:4px}
+.msg .time{font-size:0.7em;opacity:0.5;margin-top:4px}
+.typing{align-self:flex-start;padding:12px 16px;background:#2d2d5e;border-radius:16px;border-bottom-left-radius:4px}
+.typing span{display:inline-block;width:8px;height:8px;background:#888;border-radius:50%;margin:0 2px;animation:bounce 1.4s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+.input-area{padding:16px;border-top:1px solid #2d2d5e;display:flex;gap:8px}
+.input-area input{flex:1;background:#2d2d5e;border:none;padding:12px 16px;border-radius:24px;color:#fff;font-size:0.95em;outline:none}
+.input-area button{background:#e94560;border:none;width:44px;height:44px;border-radius:50%;color:#fff;font-size:1.2em;cursor:pointer}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.demo-controls{text-align:center;padding:20px}
+.demo-btn{background:#e94560;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:1em;cursor:pointer;margin:4px}
+.demo-btn:hover{background:#d63851}
+.scenarios{max-width:500px;margin:0 auto 20px;padding:0 16px}
+.scenario{background:#1a1a2e;border-radius:12px;padding:16px;margin-bottom:8px;cursor:pointer;border:1px solid #2d2d5e;transition:border-color 0.2s}
+.scenario:hover{border-color:#e94560}
+.scenario h3{font-size:0.95em;margin-bottom:4px}
+.scenario p{font-size:0.8em;opacity:0.6}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>🤖 AI Assistant Demo</h1>
+<p>See how your personal AI handles real business scenarios</p>
+</div>
+
+<div class="scenarios">
+<div class="scenario" onclick="runDemo('airbnb')">
+<h3>🏡 Airbnb Host Scenario</h3>
+<p>Guest inquiry → auto-drafted response → check-in instructions</p>
+</div>
+<div class="scenario" onclick="runDemo('tango')">
+<h3>💃 Dance Teacher Scenario</h3>
+<p>Class reminder → student follow-up → social media post</p>
+</div>
+<div class="scenario" onclick="runDemo('business')">
+<h3>💼 Business Owner Scenario</h3>
+<p>Client follow-up → meeting prep → email draft</p>
+</div>
+</div>
+
+<div class="chat-container">
+<div class="chat-header">
+<div class="avatar">🤖</div>
+<div>
+<div class="name">Your AI Assistant</div>
+<div class="status">● Online — running locally</div>
+</div>
+</div>
+<div class="messages" id="messages">
+<div class="msg bot">
+Hi! I'm your personal AI assistant. I run 24/7 on your device, and I remember everything about your business. Try one of the scenarios above! 👆
+<div class="time">Just now</div>
+</div>
+</div>
+<div class="input-area">
+<input type="text" placeholder="Type a message..." id="input" onkeypress="if(event.key==='Enter')sendMsg()">
+<button onclick="sendMsg()">→</button>
+</div>
+</div>
+
+<script>
+const demos = {
+airbnb: [
+{user: "New Airbnb inquiry from Sarah — she wants to know about parking and check-in time"},
+{bot: "I've drafted a reply for Sarah:\n\n\"Hi Sarah! Thank you for your interest! 🎉\n\n✅ Free parking: We have a dedicated spot in the driveway, plus street parking is free.\n\n✅ Check-in: 3:00 PM, but early check-in is often available — just ask!\n\n✅ Self check-in: I'll send you the door code the morning of your arrival.\n\nAny other questions? Looking forward to hosting you!\"\n\nShall I send this, or would you like to modify anything?"},
+{user: "Send it. Also remind me to schedule cleaning for after her checkout"},
+{bot: "✅ Reply sent to Sarah.\n\n📅 I've set a reminder for Sarah's checkout date (checking your calendar... she hasn't booked yet). Once she confirms, I'll automatically:\n1. Schedule the cleaning crew\n2. Send check-in instructions 24h before arrival\n3. Send a 'How was your stay?' follow-up after checkout\n\nAnything else?"}
+],
+tango: [
+{user: "Send a class reminder to the Tuesday beginner group"},
+{bot: "📱 Draft for Tuesday Beginners (8 students):\n\n\"Hi! Just a reminder — Tango class tomorrow (Tuesday) at 7:30 PM. We'll be working on the cross and milonga walk. Wear comfortable shoes! 💃🕺\n\nSee you there!\n— Fede\"\n\nRecipients: Maria, Carlos, Lisa, Tom, Ana, Diego, Sarah, James\n\nSend to all 8 via WhatsApp?"},
+{user: "Yes, send. Also write an Instagram post about tomorrow's class"},
+{bot: "✅ Reminder sent to 8 students.\n\n📸 Instagram post draft:\n\n\"Tomorrow night: Tango Beginners 🔥\n\nWe're diving into the cross — that magical moment where leader and follower connect in perfect harmony.\n\nNo partner needed. No experience required. Just bring your curiosity.\n\n📍 [Your Studio]\n🕢 7:30 PM\n💰 $20 drop-in\n\n#tango #argentinetango #tangoclass #fortlauderdale #danceclasses #beginners\"\n\nShall I post this, or schedule it for tomorrow morning for better engagement?"}
+],
+business: [
+{user: "What meetings do I have tomorrow and what should I prep?"},
+{bot: "📅 Tomorrow's schedule:\n\n9:00 AM — Call with David (insurance renewal)\n  → Prep: Last year's premium was $2,400. Compare with 3 quotes I found last week.\n\n11:30 AM — Lunch with potential client Rachel\n  → Prep: She owns a boutique on Las Olas. Interested in social media management. Bring pricing sheet.\n\n3:00 PM — Quarterly review call\n  → Prep: Revenue up 12% QoQ. Top clients: Martinez Group ($4.2K/mo), Chen Studios ($2.8K/mo).\n\nI can draft talking points for any of these. Which one?"},
+{user: "Draft an email to Rachel confirming lunch"},
+{bot: "✉️ Draft:\n\nSubject: Confirming tomorrow's lunch — looking forward!\n\nHi Rachel,\n\nJust confirming our lunch tomorrow at 11:30 AM. I was thinking Las Olas Café — does that work for you?\n\nI've been thinking about some ideas for your boutique's social presence and I'm excited to share them. It'll be a relaxed conversation, no pressure.\n\nSee you tomorrow!\n\nBest,\n[Your Name]\n\nShall I send this from your email?"}
+]};
+
+let currentDemo = null;
+let demoStep = 0;
+
+function addMsg(text, type) {
+    const el = document.createElement('div');
+    el.className = `msg ${type}`;
+    el.innerHTML = text.replace(/\n/g, '<br>') + `<div class="time">Just now</div>`;
+    document.getElementById('messages').appendChild(el);
+    el.scrollIntoView({behavior:'smooth'});
+}
+
+function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'typing';
+    el.id = 'typing';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    document.getElementById('messages').appendChild(el);
+    el.scrollIntoView({behavior:'smooth'});
+}
+
+function removeTyping() {
+    const el = document.getElementById('typing');
+    if(el) el.remove();
+}
+
+function runDemo(type) {
+    currentDemo = demos[type];
+    demoStep = 0;
+    document.getElementById('messages').innerHTML = '';
+    nextStep();
+}
+
+function nextStep() {
+    if(!currentDemo || demoStep >= currentDemo.length) return;
+    const step = currentDemo[demoStep];
+    if(step.user) {
+        addMsg(step.user, 'user');
+        demoStep++;
+        setTimeout(()=>{showTyping(); setTimeout(()=>{removeTyping(); nextStep();}, 1500);}, 500);
+    } else if(step.bot) {
+        addMsg(step.bot, 'bot');
+        demoStep++;
+        if(demoStep < currentDemo.length) {
+            setTimeout(nextStep, 2000);
+        }
+    }
+}
+
+function sendMsg() {
+    const input = document.getElementById('input');
+    if(!input.value.trim()) return;
+    addMsg(input.value, 'user');
+    input.value = '';
+    showTyping();
+    setTimeout(()=>{
+        removeTyping();
+        addMsg("I understand! Let me work on that for you. (This is a demo — in the real version, I'd process your request using your business context, contacts, and preferences.) 🤖", 'bot');
+    }, 1500);
+}
+</script>
+</body>
+</html>

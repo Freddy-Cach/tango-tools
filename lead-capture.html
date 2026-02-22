@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free AI Readiness Check</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:#0f0f23;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{max-width:500px;width:100%}
+h1{font-size:1.8em;text-align:center;margin-bottom:8px}
+.subtitle{text-align:center;opacity:.7;margin-bottom:32px}
+.question{background:#1a1a2e;border-radius:16px;padding:24px;margin-bottom:16px;display:none}
+.question.active{display:block}
+.question h2{font-size:1.1em;margin-bottom:16px}
+.option{display:block;background:#2d2d5e;border:2px solid transparent;border-radius:12px;padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:all .2s;font-size:.95em;color:#fff;text-align:left;width:100%}
+.option:hover{border-color:#e94560;background:#3d3d7e}
+.result{background:#1a1a2e;border-radius:16px;padding:32px;text-align:center;display:none}
+.result.active{display:block}
+.score{font-size:3em;font-weight:800;margin:16px 0}
+.score.high{color:#4ade80}
+.score.mid{color:#fbbf24}
+.score.low{color:#e94560}
+.result p{margin:8px 0;opacity:.8}
+.cta-btn{display:inline-block;background:#e94560;color:#fff;padding:14px 40px;border-radius:8px;font-size:1.1em;font-weight:700;text-decoration:none;margin-top:20px}
+.progress{display:flex;gap:4px;justify-content:center;margin-bottom:24px}
+.dot{width:10px;height:10px;border-radius:50%;background:#2d2d5e}
+.dot.filled{background:#e94560}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🤖 AI Readiness Check</h1>
+<p class="subtitle">Find out if a personal AI assistant makes sense for your business (30 seconds)</p>
+
+<div class="progress" id="progress"></div>
+
+<div class="question active" data-q="0">
+<h2>How much time do you spend on repetitive admin tasks per week?</h2>
+<button class="option" onclick="answer(3)">🔥 10+ hours — I'm drowning</button>
+<button class="option" onclick="answer(2)">⏰ 5-10 hours — it adds up</button>
+<button class="option" onclick="answer(1)">✅ Under 5 hours — manageable</button>
+</div>
+
+<div class="question" data-q="1">
+<h2>Do you answer similar questions/messages repeatedly?</h2>
+<button class="option" onclick="answer(3)">Yes, constantly (clients, guests, students)</button>
+<button class="option" onclick="answer(2)">Sometimes — a few recurring ones</button>
+<button class="option" onclick="answer(1)">Rarely — each interaction is unique</button>
+</div>
+
+<div class="question" data-q="2">
+<h2>How do you feel about AI and technology?</h2>
+<button class="option" onclick="answer(3)">I want AI but don't know where to start</button>
+<button class="option" onclick="answer(2)">I use ChatGPT sometimes</button>
+<button class="option" onclick="answer(1)">I'm skeptical about AI</button>
+</div>
+
+<div class="question" data-q="3">
+<h2>What's your biggest business pain point right now?</h2>
+<button class="option" onclick="answer(3,'time')">Not enough time in the day</button>
+<button class="option" onclick="answer(3,'clients')">Losing clients due to slow responses</button>
+<button class="option" onclick="answer(2,'content')">Can't keep up with social media/content</button>
+<button class="option" onclick="answer(1,'other')">Something else</button>
+</div>
+
+<div class="result" id="result">
+<h2>Your AI Readiness Score</h2>
+<div class="score" id="scoreText"></div>
+<p id="resultMsg"></p>
+<p id="savings" style="font-size:1.2em;font-weight:700;color:#4ade80;margin-top:16px"></p>
+<a href="https://wa.me/15612981204?text=Hi%20Fede!%20I%20just%20took%20the%20AI%20readiness%20quiz%20and%20scored%20high.%20I%27d%20love%20to%20see%20a%20demo!" class="cta-btn">Get Your Free Demo →</a>
+<p style="margin-top:12px;font-size:.8em;opacity:.5">No obligation. 15-minute call.</p>
+</div>
+</div>
+
+<script>
+let current=0,total=0,pain='';
+const qs=document.querySelectorAll('.question');
+const dots=document.getElementById('progress');
+for(let i=0;i<qs.length;i++){const d=document.createElement('div');d.className='dot'+(i===0?' filled':'');dots.appendChild(d)}
+
+function answer(points,p){
+    total+=points;
+    if(p)pain=p;
+    qs[current].classList.remove('active');
+    current++;
+    dots.children[current-1].classList.add('filled');
+    if(current<qs.length){
+        qs[current].classList.add('active');
+        if(current<dots.children.length)dots.children[current].classList.add('filled');
+    }else{showResult()}
+}
+
+function showResult(){
+    const r=document.getElementById('result');
+    const s=document.getElementById('scoreText');
+    const m=document.getElementById('resultMsg');
+    const sv=document.getElementById('savings');
+    r.classList.add('active');
+    const pct=Math.round(total/12*100);
+    s.textContent=pct+'%';
+    s.className='score '+(pct>=75?'high':pct>=50?'mid':'low');
+    if(pct>=75){
+        m.textContent='You are a PERFECT fit for a personal AI assistant. You could save 40-60 hours/month.';
+        sv.textContent='Estimated savings: $2,000-3,000/month in time value';
+    }else if(pct>=50){
+        m.textContent='An AI assistant would significantly help your business. Worth exploring.';
+        sv.textContent='Estimated savings: $500-1,500/month in time value';
+    }else{
+        m.textContent='You might not need a full AI assistant yet, but a quick demo could change your mind.';
+        sv.textContent='';
+    }
+}
+</script>
+</body>
+</html>
